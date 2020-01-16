@@ -1,25 +1,15 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import Bcrypt from "bcryptjs";
 const router: Router = express.Router();
 const User = require('../models/user');
 require('mongoose').set('debug', true);
 router.use(bodyParser.json());
 
-const uri = 'mongodb+srv://domenicosf:TtbR4pBFaEowR6XL@cluster0-baygv.mongodb.net/justmeatdb?retryWrites=true&w=majority';
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err: Error) => {
-    if(err) {
-        console.error(`${err}`);
-    } else {
-        console.log('Connected to MongoDB');
-    }
-});
-
 router.post('/register', async (req: Request, res: Response) => {
     try {
-        var user = User.findOne({ username: req.body.username }).exec();
+        var user = await User.findOne({ username: req.body.username });
         if(user.username === req.body.username){
             return res.status(403).send({message: 'Username already in use'});
         }
@@ -52,7 +42,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
 router.post('/login', async (req: Request, res: Response) => {
     try {
-        let user = await User.findOne({ username: req.body.username }).exec();
+        let user = await User.findOne({ username: req.body.username });
         if(!user) {
             return res.status(400).send({ message: "The username does not exist" });
         }

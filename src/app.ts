@@ -3,11 +3,13 @@ import Users from './routes/users';
 import Restaurants from './routes/restaurants';
 import Orders from './routes/orders';
 import cors from 'cors';
+import { dbConnect } from './dbConnection/connection';
 
 const app: Application = express();
 const PORT = 3006;
 
 
+dbConnect();
 
 app.use(cors());
 app.use('/users', Users);
