@@ -4,12 +4,18 @@ import Restaurants from './routes/restaurants';
 import Orders from './routes/orders';
 import cors from 'cors';
 import { dbConnect } from './dbConnection/connection';
+import mongoose from 'mongoose';
+mongoose.set('debug', true);
+mongoose.set('useFindAndModify', false);
 
 const app: Application = express();
 const PORT = 3006;
 
-
-dbConnect();
+dbConnect().then(()=> { 
+        console.log('Connected to MongoDB');
+    }).catch((error: Error) => {
+        console.error(error);
+    });
 
 app.use(cors());
 app.use('/users', Users);

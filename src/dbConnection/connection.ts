@@ -5,11 +5,5 @@ export async function dbConnect() {
     await mongoose.connect(uri, { 
         useNewUrlParser: true, 
         useUnifiedTopology: true 
-    }, (err: Error) => {
-        if(err) {
-            console.error(`${err}`);
-        } else {
-            console.log('Connected to MongoDB');
-        }
     });
 }
