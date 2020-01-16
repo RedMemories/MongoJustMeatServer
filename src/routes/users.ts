@@ -5,25 +5,21 @@ import mongoose from 'mongoose';
 import Bcrypt from "bcryptjs";
 const router: Router = express.Router();
 const User = require('../models/user');
+require('mongoose').set('debug', true);
 router.use(bodyParser.json());
-const db = 'mongodb+srv://domenicosf:admin@cluster0-baygv.mongodb.net/justmeatdb?retryWrites=true&w=majority';
-async () => {
-    await mongoose.connect(db, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    }, (err) => {
-        if(err) {
-            console.error(`${err}`);
-        } else {
-            console.log('Connected to MongoDB');
-        }
-    });
-}
+
+const uri = 'mongodb+srv://domenicosf:TtbR4pBFaEowR6XL@cluster0-baygv.mongodb.net/justmeatdb?retryWrites=true&w=majority';
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err: Error) => {
+    if(err) {
+        console.error(`${err}`);
+    } else {
+        console.log('Connected to MongoDB');
+    }
+});
 
 router.post('/register', async (req: Request, res: Response) => {
     try {
-        let user = await User.findOne({ username: req.body.username }).exec();
-        console.log(user) // TODO verify now doesn't work with await
+        var user = User.findOne({ username: req.body.username }).exec();
         if(user.username === req.body.username){
             return res.status(403).send({message: 'Username already in use'});
         }
