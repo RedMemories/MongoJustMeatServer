@@ -8,16 +8,13 @@ router.use(bodyParser.json());
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     jwt.verify(req.query.token, 'FLIZsTmhpB', (err: Error) => {
-        if(err) {
-            return res.status(401).send({ message: 'Unauthorized request' });
-        }
-    });
-    next();
+        err ? res.status(401).send({ message: 'Unauthorized request' }) : next();
+    }); 
 }
 
 router.post('/register', async (req: Request, res: Response) => {
     try {
-        var user = await User.findOne({ username: req.body.username }).exec();
+        let user = User.findOne({ username: req.body.username }).exec();
         if(user.username === req.body.username){
             return res.status(403).send({message: 'Username already in use'});
         }
@@ -82,7 +79,7 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 router.put('/update/:username', verifyToken, async (req: Request, res: Response) => {
-    await User.findOneAndUpdate({ username: req.params.username },  req.body, { new: true }).exec((err: Error, doc: any) => {
+    await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error, doc: any) => {
         if(err) {
             return res.status(404).send('User not found...');
         }
