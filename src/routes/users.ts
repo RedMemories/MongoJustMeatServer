@@ -1,9 +1,11 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
+import { check, validationResult } from 'express-validator';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import Bcrypt from "bcryptjs";
 const router: Router = express.Router();
 const User = require('../models/user');
+
 router.use(bodyParser.json());
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {

@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/app.ts",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha MongoJustMeatServer/tests/test.ts",
+    "test-watch": "nodemon --exec 'npm test'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/cors": "^2.8.6",
+    "@types/supertest": "^2.0.8",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -25,6 +28,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^8.3.6",
-    "@types/mongoose": "^5.5.41"
+    "@types/mongoose": "^5.5.41",
+    "supertest": "^4.0.2"
   }
 }
