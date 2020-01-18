@@ -1,8 +1,53 @@
-const app = require('../app');
+const app = require('../../lib/app.js');
 var assert = require('assert');
 const request = require('supertest');
+const User = require('../../lib/models/user.js');
 
-describe('POST user/login', () => {
+// register test success
+
+describe('POST users/register', () => {
+	it('test success users/register', (done) => {
+		let testUser = {
+			username: "test",
+			password: "pswtest",
+			name: "test",
+			surname: "test",
+			address: "no address",
+			phone: "no phone",
+			email: "mail@test.it"
+
+		}
+		request(app)
+		.post('/users/register')
+		.send(testUser)
+		.set('Accept', 'application/json')
+		.expect('Content-Type', /json/)
+		.expect(200)
+		.end(() => {
+			User.findOneAndDelete({ username: testUser.username}).exec(); //delete user after test passed
+		});
+		done();
+	});
+	it('expect 403 user alrady present in db', (done) => {
+		const testFailUser = {
+			username: "sfsimone99",
+			password: "ciaomondo",
+			name: "Simone",
+			surname: "Signore Fiore",
+			address: "Via Veronica 33",
+			phone: "340 422 1442",
+			email: "simone.signorefiore@gmail.com"
+		}
+		request(app)
+		.post('/users/register')
+		.send(testFailUser)
+		.set('Accept', 'application/json')
+		.expect('Content-Type', /json/)
+		.expect(403, done);
+	});
+});
+
+describe('POST users/login', () => {
 	it('test success users/login', (done) => {
 		let loginTest = {
 			username: "annaromatteo99",
@@ -14,7 +59,29 @@ describe('POST user/login', () => {
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(200, done);
-	})
+	});
+	it('login failed for wrong data', (done) => {
+		let loginTest = {
+			username: "pippo",
+			password: "cioa"
+		}
+		request(app)
+		.post('/users/login')
+		.send(loginTest)
+		.set('Accept', 'application/json')
+		.expect('Content-Type', /json/)
+		.expect(404, done);
+	});
+});
+
+describe('GET users/', () => {
+	it('test success for users/', (done) => {
+		request(app)
+		.get('/users')
+		.set('Accept', 'application/json')
+		.expect('Content-Type', /json/)
+		.expect(200, done);
+	});
 });
 
 

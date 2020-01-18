@@ -14,10 +14,24 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     }); 
 }
 
+router.get('/', async (req: Request, res: Response) => {
+    if(req.query.username) {
+        let user = await User.findOne({ username: req.query.username }).exec();
+        return res.json(user);
+    }
+    await User.find({}).exec((err: Error, users: any) => {
+        if(err){
+           return res.send(err);
+        }
+        return res.json(users);
+    })
+    
+});
+
 router.post('/register', async (req: Request, res: Response) => {
     try {
-        let user = User.findOne({ username: req.body.username }).exec();
-        if(user.username === req.body.username){
+        let user = await User.findOne({ username: req.body.username }).exec();
+        if(user){
             return res.status(403).send({message: 'Username already in use'});
         }
         req.body.password = Bcrypt.hashSync(req.body.password, 10);
@@ -51,10 +65,10 @@ router.post('/login', async (req: Request, res: Response) => {
     try {
         let user = await User.findOne({ username: req.body.username }).exec();
         if(!user) {
-            return res.status(400).send({ message: "The username does not exist" });
+            return res.status(404).send({ message: "The username does not exist" });
         }
         if(!Bcrypt.compareSync(req.body.password, user.password)) {
-            return res.status(400).send({ message: "The password is invalid" });
+            return res.status(404).send({ message: "The password is invalid" });
         }
         let payload;
         if(user.username === 'admin') {

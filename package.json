@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon src/app.ts",
     "build": "tsc -p .",
-    "test": "mocha src/tests/test.ts"
+    "test": "tsc -p . && mocha lib/tests --timeout 10000"
   },
   "keywords": [],
   "author": "",

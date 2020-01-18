@@ -5,7 +5,7 @@ import Orders from './routes/orders';
 import cors from 'cors';
 import { dbConnect } from './dbConnection/connection';
 import mongoose from 'mongoose';
-mongoose.set('debug', true);
+mongoose.set('debug', false);
 mongoose.set('useFindAndModify', false);
 
 const app: Application = express();
