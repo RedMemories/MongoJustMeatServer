@@ -34,8 +34,8 @@ router.post('/', async(req: Request, res: Response) => {
     }
 });
 
-router.put('/:name', async (req: Request, res: Response) => {
-        await Restaurant.findOneAndUpdate({ name: req.params.name}, req.body, { new: true }).exec((err: Error, doc: any) => {
+router.put('/:id', async (req: Request, res: Response) => {
+        await Restaurant.findOneAndUpdate({id: req.params._id}, req.body, { new: true }).exec((err: Error, doc: any) => {
             if(err) {
                 return res.status(404).send('Restaurant not found...');
             }
