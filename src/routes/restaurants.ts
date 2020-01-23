@@ -8,6 +8,7 @@ router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant = require('../models/restaurant');
 
 
+
 router.get('/', async (req: Request, res: Response) => {
     if(req.query.name) {
         let restaurant = await Restaurant.findOne({ name: req.query.name }).exec();
