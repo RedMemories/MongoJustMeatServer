@@ -6,8 +6,6 @@ const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant = require('../models/restaurant');
-const Order = require('../models/order');
-
 
 
 router.get('/', async (req: Request, res: Response) => {
