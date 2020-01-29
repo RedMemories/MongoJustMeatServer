@@ -14,7 +14,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/create', async(req: Request, res: Response) => {
+router.post('/', async(req: Request, res: Response) => {
     try{
         let restaurant = await Restaurant.findOne({ name: req.body.name }).exec();
         if(restaurant){
