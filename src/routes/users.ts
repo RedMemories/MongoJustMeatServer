@@ -3,8 +3,10 @@ import { check, validationResult } from 'express-validator';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import Bcrypt from "bcryptjs";
+import { IUser } from '../models/user';
+import { Model } from 'mongoose';
 const router: Router = express.Router();
-const User = require('../models/user');
+const User: Model<IUser> = require('../models/user');
 
 router.use(bodyParser.json());
 
@@ -107,7 +109,7 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 router.put('/:username', verifyToken, async (req: Request, res: Response) => {
-    await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error, doc: any) => {
+    await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error, doc: IUser) => {
         if(err) {
             return res.status(404).send('User not found...');
         }
@@ -119,7 +121,7 @@ router.put('/:username', verifyToken, async (req: Request, res: Response) => {
 });
 
 router.delete('/:username', verifyToken, async (req: Request, res: Response) => {
-    await User.findOneAndDelete({ username: req.params.username }).exec((err: Error, doc: any) => {
+    await User.findOneAndDelete({ username: req.params.username }).exec((err: Error, doc: IUser) => {
         if(err) {
             return res.status(404).send(err);
         }

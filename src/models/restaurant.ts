@@ -1,19 +1,19 @@
 import mongoose , {Schema,Document} from 'mongoose';
 export interface IRestaurant extends Document{
-    name: String,
-    address: String,
-    city: String,
-    email: String,
+    name: string,
+    address: string,
+    city: string,
+    email: string,
     plates: IPlates[],
-    rating: Number,
-    typology: String
+    rating: number,
+    typology: string
 }
 export interface IPlates extends Document{
-    name : String,
-    quantity : number,
+    name : string,
+    quantity: number,
     price : number
 }
-const restaurantSchema : Schema = new Schema({
+const restaurantSchema: Schema = new Schema({
     name: String,
     address: String,
     city: String,

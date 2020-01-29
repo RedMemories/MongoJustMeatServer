@@ -1,5 +1,4 @@
 const app = require('../../lib/app.js');
-var assert = require('assert');
 const request = require('supertest');
 const User = require('../../lib/models/user.js');
 
@@ -15,7 +14,6 @@ describe('POST users', () => {
 			address: "no address",
 			phone: "no phone",
 			email: "mail@test.it"
-
 		}
 		request(app)
 		.post('/users')
