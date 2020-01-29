@@ -1,7 +1,5 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
+import express, {Request, Response, Router} from 'express';
 import bodyParser from 'body-parser';
-import { Schema } from 'mongoose';
-import { dbConnect } from '../dbConnection/connection';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
@@ -16,7 +14,7 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/', async(req: Request, res: Response) => {
+router.post('/create', async(req: Request, res: Response) => {
     try{
         let restaurant = await Restaurant.findOne({ name: req.body.name }).exec();
         if(restaurant){
