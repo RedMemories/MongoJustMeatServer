@@ -1,7 +1,5 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
 import bodyParser from 'body-parser';
-import { Schema } from 'mongoose';
-import { dbConnect } from '../dbConnection/connection';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
