@@ -19,6 +19,10 @@ router.get('/', async (req: Request, res: Response) => {
         let user = await User.findOne({ username: req.query.username }).exec();
         return res.json(user);
     }
+    if(req.query.id) {
+        let user = await User.findById({ _id: req.query.id }).exec();
+        return res.json(user);
+    }
     await User.find({}).exec((err: Error, users: any) => {
         if(err){
            return res.send(err);
@@ -28,8 +32,16 @@ router.get('/', async (req: Request, res: Response) => {
     
 });
 
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/', [
+    check('email').isEmail(),
+    check('password').isLength({ min: 5 })
+  ], async (req: Request, res: Response) => {
     try {
+        const errors = validationResult(req);
+        console.log('errors:', errors);
+        if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+        }
         let user = await User.findOne({ username: req.body.username }).exec();
         if(user){
             return res.status(403).send({message: 'Username already in use'});
@@ -94,7 +106,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/update/:username', verifyToken, async (req: Request, res: Response) => {
+router.put('/:username', verifyToken, async (req: Request, res: Response) => {
     await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error, doc: any) => {
         if(err) {
             return res.status(404).send('User not found...');
@@ -106,7 +118,7 @@ router.put('/update/:username', verifyToken, async (req: Request, res: Response)
     });
 });
 
-router.delete('/delete/:username', verifyToken, async (req: Request, res: Response) => {
+router.delete('/:username', verifyToken, async (req: Request, res: Response) => {
     await User.findOneAndDelete({ username: req.params.username }).exec((err: Error, doc: any) => {
         if(err) {
             return res.status(404).send(err);

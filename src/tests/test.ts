@@ -5,8 +5,8 @@ const User = require('../../lib/models/user.js');
 
 // register test success
 
-describe('POST users/register', () => {
-	it('test success users/register', (done) => {
+describe('POST users', () => {
+	it('test success users', (done) => {
 		let testUser = {
 			username: "test",
 			password: "pswtest",
@@ -18,15 +18,15 @@ describe('POST users/register', () => {
 
 		}
 		request(app)
-		.post('/users/register')
+		.post('/users')
 		.send(testUser)
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(200)
 		.end(() => {
 			User.findOneAndDelete({ username: testUser.username}).exec(); //delete user after test passed
+			done();
 		});
-		done();
 	});
 	it('expect 403 user alrady present in db', (done) => {
 		const testFailUser = {
@@ -39,7 +39,7 @@ describe('POST users/register', () => {
 			email: "simone.signorefiore@gmail.com"
 		}
 		request(app)
-		.post('/users/register')
+		.post('/users')
 		.send(testFailUser)
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
