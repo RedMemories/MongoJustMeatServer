@@ -29,9 +29,9 @@ const orderSchema: Schema = new Schema({
         price : Number
         }
     ],
-    totalAmount: Number,
+    totalAmount: { type: Number, default: 0 },
     rating : { type: Number, default: null},
-    statusOrder: Boolean
+    statusOrder: { type: Boolean, default: false}
 });
 
 

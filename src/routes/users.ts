@@ -6,11 +6,29 @@ import Bcrypt from "bcryptjs";
 import { IUser } from '../models/user';
 import { Model } from 'mongoose';
 import { verifyToken } from '../JwtVerify/verify';
+import { IOrder } from '../models/order';
 const router: Router = express.Router();
 const User: Model<IUser> = require('../models/user');
+const Order: Model<IOrder> = require('../models/order');
 
 router.use(bodyParser.json());
 
+router.get('/:userId/orders', verifyToken, async (req: Request, res: Response) => {
+    if(req.params.userId){
+        let user: IUser | null = await User.findById({ _id: req.params.userId }).exec();
+        if(!user) {
+            res.status(404).send('User not found');
+        }
+        await Order.find({ user: req.params.userId}).exec((err: Error, userOrders: IOrder) => {
+            if(err) {
+                return res.send(err);
+            }
+            return res.json({userOrders});
+        });
+    } else {
+        return res.send('UserId required');
+    }
+});
 
 
 router.get('/', async (req: Request, res: Response) => {
@@ -37,13 +55,8 @@ router.post('/', [
   ], async (req: Request, res: Response) => {
     try {
         const errors = validationResult(req);
-        console.log('errors:', errors);
         if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
-        }
-        let user = await User.findOne({ username: req.body.username }).exec();
-        if(user){
-            return res.status(403).send({message: 'Username already in use'});
         }
         req.body.password = Bcrypt.hashSync(req.body.password, 10);
         let newUser = new User(req.body);

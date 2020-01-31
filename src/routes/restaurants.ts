@@ -2,12 +2,29 @@ import express, {Request, Response, Router} from 'express';
 import bodyParser from 'body-parser';
 import { Model } from 'mongoose';
 import { IRestaurant } from '../models/restaurant';
+import { IOrder } from '../models/order';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant: Model<IRestaurant> = require('../models/restaurant');
+const Order: Model<IOrder> = require('../models/order');
 
-
+router.get('/:restaurantId/orders', async (req: Request, res: Response) => {
+    if(req.params.restaurantId){
+        let restaurant: IRestaurant | null = await Restaurant.findById({ _id: req.params.restaurantId }).exec();
+        if(!restaurant) {
+            res.status(404).send('User not found');
+        }
+        await Order.find({ restaurant: req.params.restaurantId}).exec((err: Error, restaurantOrders: IOrder) => {
+            if(err) {
+                return res.send(err);
+            }
+            return res.json({restaurantOrders});
+        });
+    } else {
+        return res.send('Restaurant Id required');
+    }
+});
 
 router.get('/', async (req: Request, res: Response) => {
     if(req.query.name) {
