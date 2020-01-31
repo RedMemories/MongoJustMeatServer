@@ -4,13 +4,12 @@ export interface IRestaurant extends Document{
     address: string,
     city: string,
     email: string,
-    plates: IPlates[],
+    plates: IPlatesRest[],
     rating: number,
     typology: string
 }
-export interface IPlates extends Document{
+export interface IPlatesRest extends Document{
     name : string,
-    quantity: number,
     price : number
 }
 const restaurantSchema: Schema = new Schema({

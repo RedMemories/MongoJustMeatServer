@@ -1,9 +1,11 @@
 import express, {Request, Response, Router} from 'express';
 import bodyParser from 'body-parser';
+import { Model } from 'mongoose';
+import { IRestaurant } from '../models/restaurant';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
-const Restaurant = require('../models/restaurant');
+const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 
 
 
@@ -12,6 +14,13 @@ router.get('/', async (req: Request, res: Response) => {
         let restaurant = await Restaurant.findOne({ name: req.query.name }).exec();
         return res.json(restaurant);
     }
+    Restaurant.find({}).exec((err: Error, doc: IRestaurant) => {
+        if(err) {
+            return res.send(err);
+        }
+        return res.json(doc);
+    })
+    return 
 });
 
 router.post('/', async(req: Request, res: Response) => {
@@ -19,7 +28,7 @@ router.post('/', async(req: Request, res: Response) => {
         let restaurant = await Restaurant.findOne({ name: req.body.name }).exec();
         if(restaurant){
             return res.status(403).send({message: 'Restaurant already esist'});
-        }else{
+        } else {
             let newRestaurant = new Restaurant(req.body);
             let result = await newRestaurant.save();
             res.json({

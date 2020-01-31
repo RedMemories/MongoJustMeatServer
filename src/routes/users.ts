@@ -5,16 +5,13 @@ import jwt from 'jsonwebtoken';
 import Bcrypt from "bcryptjs";
 import { IUser } from '../models/user';
 import { Model } from 'mongoose';
+import { verifyToken } from '../JwtVerify/verify';
 const router: Router = express.Router();
 const User: Model<IUser> = require('../models/user');
 
 router.use(bodyParser.json());
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    jwt.verify(req.query.token, 'FLIZsTmhpB', (err: Error) => {
-        err ? res.status(401).send({ message: 'Unauthorized request' }) : next();
-    }); 
-}
+
 
 router.get('/', async (req: Request, res: Response) => {
     if(req.query.username) {

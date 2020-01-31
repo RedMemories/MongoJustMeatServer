@@ -1,9 +1,10 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
 import bodyParser from 'body-parser';
-import { IPlates, IRestaurant } from '../models/restaurant';
-import {IOrder} from '../models/order';
+import { IRestaurant, IPlatesRest } from '../models/restaurant';
+import { IOrder, IPlatesOrder } from '../models/order';
 import {IUser} from '../models/user'
 import { Model } from 'mongoose';
+import { verifyToken } from '../JwtVerify/verify';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
@@ -24,7 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
     })
 })
 
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', verifyToken, async (req: Request, res: Response) => {
     try {
         let data:[IUser ,IRestaurant] = await Promise.all([
             await User.findById({ _id: req.body.user }),
@@ -33,10 +34,10 @@ router.post('/', async (req: Request, res: Response) => {
         if(!data[0]) return res.status(404).send({message: 'User not found'});
         if(!data[1]) return res.status(404).send({message: 'Restaurant not found'});
         const existPlate = req.body.orderItems
-            .every(( orderPlate: IPlates ) => data[1].plates.map((restaurantPlate: any) => restaurantPlate._id)
+            .every(( orderPlate: IPlatesOrder ) => data[1].plates.map((restaurantPlate: IPlatesRest) => restaurantPlate._id)
             .includes(orderPlate._id));
         if(!existPlate) return res.status(404).send({message: 'Can\'t order this plates'});
-        req.body.totalAmount = req.body.orderItems.reduce((total: number, orderPlate: IPlates ) => total + (+orderPlate.price  * +orderPlate.quantity))
+        req.body.totalAmount = req.body.orderItems.reduce((total: number, orderPlate: IPlatesOrder ) => total + (orderPlate.price  * orderPlate.quantity))
         let newOrder = new Order(req.body);
         let result = await newOrder.save();
         res.json({
@@ -47,27 +48,24 @@ router.post('/', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/:id', async (req: Request, res: Response) => {
-    await Order.findOneAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error, doc: IOrder) => {
+router.put('/:id', verifyToken, async (req: Request, res: Response) => {
+    await Order.findOneAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
         if(err){
             return res.status(404).send('Order not found');
         }
-        res.json({
-            message: 'Order successful update',
-            document: doc
-        });
+        return res.send('Order successful update');
     });
 });
 
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
     await Order.findByIdAndDelete( { _id: req.params.id}).exec( (err: Error, doc: IOrder) => {
         if(err){
             return res.status(404).send('Order not found');
         }
-        res.json({
+        return res.json({
             message: 'Order successful deleted',
             document: doc
         });
-    })
-})
+    });
+});
 export = router;

@@ -1,15 +1,20 @@
 import mongoose , {Schema,Document} from 'mongoose';
-import {IPlates} from '../models/restaurant'
 export interface IOrder extends Document{
     user: string,
     restaurant: string,
     date: Date ,
     shippingAddress : string,
-    orderItems: IPlates[],
+    orderItems: IPlatesOrder[],
     totalAmount: number,
     rating : number,
     statusOrder : boolean
+}
 
+export interface IPlatesOrder extends Document{
+    _id: string,
+    name : string,
+    quantity: number,
+    price : number
 }
 
 const orderSchema: Schema = new Schema({
