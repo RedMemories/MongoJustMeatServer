@@ -10,7 +10,7 @@ const restaurantSchema: Schema = new Schema({
         quantity : Number,
         price: Number
     }],
-    rating: Number,
+    rating: { type: Number, default: 0},
     typology: String
 });
 
@@ -20,7 +20,7 @@ export interface IRestaurant extends Document{
     city: string,
     email: string,
     plates: IPlatesRest[],
-    rating: number | null,
+    rating: number,
     typology: string
 }
 export interface IPlatesRest extends Document{

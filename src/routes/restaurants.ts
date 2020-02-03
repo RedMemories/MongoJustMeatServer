@@ -30,18 +30,16 @@ router.get('/:restaurantId/orders', [
     });
 });
 
-router.get('/', [
-    query('name').exists().isString()
-], async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-    if(req.query.name) {
-        let restaurant = await Restaurant.findOne({ name: req.query.name }).exec();
+router.get('/', async (req: Request, res: Response) => {
+    if(req.query.id) {
+        let restaurant: IRestaurant | null = await Restaurant.findById({ _id: req.query.id }).exec();
         return res.json(restaurant);
     }
-    Restaurant.find({}).exec((err: Error, doc: IRestaurant) => {
+    if(req.query.city) {
+        let restaurant: Array<IRestaurant> | null = await Restaurant.find({ city: req.query.city }).exec();
+        return res.json(restaurant);
+    }
+    Restaurant.find({}).exec((err: Error, doc: Array<IRestaurant>) => {
         if(err) {
             return res.send(err);
         }
@@ -54,11 +52,15 @@ router.post('/', [
     check('address').exists().isString(),
     check('email').exists().isEmail(),
     check('plates').isArray( {min: 1} ),
-    check('typology').exists().isString()
+    check('typology').exists().isString().isIn(['Restaurant', 'Pizza Restaurant'])
 ], verifyToken, async(req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
+    }
+    let restaurant: IRestaurant | null = await Restaurant.findOne({ name: req.body.name }).exec();
+    if(restaurant) {
+        return res.status(403).json({ message: 'Name already in use' });
     }
     try {
         let newRestaurant: IRestaurant = new Restaurant(req.body);
@@ -76,7 +78,7 @@ router.put('/:id', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    await Restaurant.findOneAndUpdate({id: req.params._id}, req.body, { new: true }).exec((err: Error) => {
+    await Restaurant.findOneAndUpdate({_id: req.params.id}, req.body, { new: true }).exec((err: Error) => {
         if(err) {
             return res.send(err);
         }
@@ -91,7 +93,7 @@ router.delete('/:id', [
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    await Restaurant.findOneAndDelete({id: req.params._id}).exec((err: Error, doc: IRestaurant) => {
+    await Restaurant.findOneAndDelete({_id: req.params.id}).exec((err: Error, doc: IRestaurant) => {
         if(err) {
             return res.send(err);
         }

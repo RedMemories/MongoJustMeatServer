@@ -1,5 +1,5 @@
+import request from "supertest";
 const app = require('../../lib/app.js');
-const request = require('supertest');
 const User = require('../../lib/models/user.js');
 
 // register test success
@@ -21,13 +21,15 @@ describe('POST users', () => {
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(201)
-		.end(() => {
-			User.findOneAndDelete({ username: testUser.username}).exec(); //delete user after test passed
-			done();
+		.end(async () => {
+			await User.findOneAndDelete({ username: testUser.username}).exec();
 		});
+		done();
 	});
 	it('expect 403 user already present in db', (done) => {
-		const testFailUser = {
+		request(app)
+		.post('/users')
+		.send({
 			username: "sfsimone99",
 			password: "ciaomondo",
 			name: "Simone",
@@ -35,37 +37,51 @@ describe('POST users', () => {
 			address: "Via Veronica 33",
 			phone: "340 422 1442",
 			email: "simone.signorefiore@gmail.com"
-		}
-		request(app)
-		.post('/users')
-		.send(testFailUser)
+		})
 		.set('Accept', 'application/json')
-		.expect('Content-Type', /json/)
+		//.expect('Content-Type', /json/)
 		.expect(403, done);
+	});
+});
+
+describe('PUT users/:username', () => {
+	it('expected test success users/:username', (done) => {
+		request(app)
+		.put('/users/lucreziaragusa99')
+		.query({
+            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwiZW1haWwiOiJzaWdub3JlZmlvcmVkb21lbmljb0B0aXNjYWxpLml0IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNTgwNzQ1MDM5LCJleHAiOjE1ODA3NDg2Mzl9.7vRNls53wI6EsEqCQpa4-USOi_Uy5n_M9CCZjfoD0A8'
+        })
+		.send({
+			username: 'pippo.pulvi',
+			name: 'Pippo',
+			surname: 'Pulvirenti',
+			address: 'Via Genova 15 Roma',
+			email: 'pippo.pulvirenti@gmail.com'
+		})
+		.set('Accept', 'application/json')
+		.expect(200, done);
 	});
 });
 
 describe('POST users/login', () => {
 	it('test success users/login', (done) => {
-		let loginTest = {
-			username: "annaromatteo99",
-			password: "iostudio"
-		}
 		request(app)
 		.post('/users/login')
-		.send(loginTest)
+		.send({
+			username: "pippo.pulvi",
+			password: "salvoavon"
+		})
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(200, done);
 	});
 	it('login failed for wrong data', (done) => {
-		let loginTest = {
-			username: "pippo",
-			password: "ciaomondo"
-		}
 		request(app)
 		.post('/users/login')
-		.send(loginTest)
+		.send({
+			username: "pippo",
+			password: "ciaomondo"
+		})
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(404, done);
