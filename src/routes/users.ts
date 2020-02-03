@@ -1,5 +1,5 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
-import { check, validationResult } from 'express-validator';
+import express, {Request, Response, Router} from 'express';
+import { check, validationResult, param, query } from 'express-validator';
 import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import Bcrypt from "bcryptjs";
@@ -13,54 +13,60 @@ const Order: Model<IOrder> = require('../models/order');
 
 router.use(bodyParser.json());
 
-router.get('/:userId/orders', verifyToken, async (req: Request, res: Response) => {
-    if(req.params.userId){
-        let user: IUser | null = await User.findById({ _id: req.params.userId }).exec();
-        if(!user) {
-            res.status(404).send('User not found');
-        }
-        await Order.find({ user: req.params.userId}).exec((err: Error, userOrders: IOrder) => {
-            if(err) {
-                return res.send(err);
-            }
-            return res.json({userOrders});
-        });
-    } else {
-        return res.send('UserId required');
+router.get('/:userId/orders', [
+    param('userId').exists().isMongoId()
+], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
     }
+    let user: IUser | null = await User.findById({ _id: req.params.userId }).exec();
+    if(!user) {
+        res.status(404).send('User not found');
+    }
+    await Order.find({ user: req.params.userId}).exec((err: Error, userOrders: IOrder) => {
+        if(err) {
+            return res.send(err);
+        }
+        return res.json({userOrders});
+    });
 });
 
 
 router.get('/', async (req: Request, res: Response) => {
     if(req.query.username) {
-        let user = await User.findOne({ username: req.query.username }).exec();
+        let user: IUser | null = await User.findOne({ username: req.query.username }).exec();
         return res.json(user);
     }
     if(req.query.id) {
-        let user = await User.findById({ _id: req.query.id }).exec();
+        let user: IUser | null = await User.findById({ _id: req.query.id }).exec();
         return res.json(user);
     }
-    await User.find({}).exec((err: Error, users: any) => {
+    await User.find({}).exec((err: Error, users: IUser) => {
         if(err){
            return res.send(err);
         }
         return res.json(users);
-    })
-    
+    })  
 });
 
 router.post('/', [
-    check('email').isEmail(),
-    check('password').isLength({ min: 5 })
+    check('username').isString(),
+    check('password').isLength({ min: 5, max: 15 }),
+    check('name').isString(),
+    check('surname').isString(),
+    check('address').isString(),
+    check('email').isEmail()
+    //check('phone').isMobilePhone('it-IT')
   ], async (req: Request, res: Response) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
-        }
+    }
+    try {
         req.body.password = Bcrypt.hashSync(req.body.password, 10);
-        let newUser = new User(req.body);
-        let payload;
+        let newUser: IUser = new User(req.body);
+        let payload: Object;
         if(req.body.username === 'admin') {
             payload = { 
                 subject: newUser._id, 
@@ -74,9 +80,9 @@ router.post('/', [
                 isAdmin: false 
             }
         }
-        let token = jwt.sign(payload, 'FLIZsTmhpB', {expiresIn: 3600});
-        let result = await newUser.save();
-        res.json({
+        let token: string = jwt.sign(payload, 'FLIZsTmhpB', {expiresIn: 3600});
+        let result: IUser = await newUser.save();
+        res.status(201).json({
             user: result,
             token: token
         });
@@ -85,16 +91,23 @@ router.post('/', [
     }
 });
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', [
+    check('username').exists().isString(),
+    check('password').isLength({ min: 5, max: 15 })
+], async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
     try {
-        let user = await User.findOne({ username: req.body.username }).exec();
+        let user: IUser | null = await User.findOne({ username: req.body.username }).exec();
         if(!user) {
             return res.status(404).send({ message: "The username does not exist" });
         }
         if(!Bcrypt.compareSync(req.body.password, user.password)) {
             return res.status(404).send({ message: "The password is invalid" });
         }
-        let payload;
+        let payload: Object;
         if(user.username === 'admin') {
             payload = { 
                 subject: user.id, 
@@ -108,8 +121,8 @@ router.post('/login', async (req: Request, res: Response) => {
                 isAdmin: false 
             }
         }
-        let token = jwt.sign(payload, 'FLIZsTmhpB', { expiresIn: 3600 });
-        res.json({
+        let token: string = jwt.sign(payload, 'FLIZsTmhpB', { expiresIn: 3600 });
+        res.status(200).json({
             message: `Welcome ${user.name}!`,
             token: token
         });
@@ -118,29 +131,37 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/:username', verifyToken, async (req: Request, res: Response) => {
-    await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error, doc: IUser) => {
+router.put('/:username', [
+    param('username').exists().isString()
+], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    await User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }).exec((err: Error) => {
         if(err) {
-            return res.status(404).send('User not found...');
+            return res.send(err);
         }
-        return res.json({
-            message: 'User updated',
-            document: doc
-        });
+        return res.status(200).send('User updated');
     });
 });
 
-router.delete('/:username', verifyToken, async (req: Request, res: Response) => {
+router.delete('/:username', [
+    param('username').exists().isString()
+], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
     await User.findOneAndDelete({ username: req.params.username }).exec((err: Error, doc: IUser) => {
         if(err) {
             return res.status(404).send(err);
         }
-        return res.json({
+        return res.status(200).json({
             message: 'User deleted',
             document: doc
         });
     });
 });
-
 
 export = router;

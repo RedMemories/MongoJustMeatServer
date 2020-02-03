@@ -11,22 +11,22 @@ describe('POST users', () => {
 			password: "pswtest",
 			name: "test",
 			surname: "test",
-			address: "no address",
-			phone: "no phone",
-			email: "mail@test.it"
+			address: "Via delle Sciare 33",
+			phone: "+393286239190",
+			email: "test@gmail.com"
 		}
 		request(app)
 		.post('/users')
 		.send(testUser)
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
-		.expect(200)
+		.expect(201)
 		.end(() => {
 			User.findOneAndDelete({ username: testUser.username}).exec(); //delete user after test passed
 			done();
 		});
 	});
-	it('expect 403 user alrady present in db', (done) => {
+	it('expect 403 user already present in db', (done) => {
 		const testFailUser = {
 			username: "sfsimone99",
 			password: "ciaomondo",
@@ -61,7 +61,7 @@ describe('POST users/login', () => {
 	it('login failed for wrong data', (done) => {
 		let loginTest = {
 			username: "pippo",
-			password: "cioa"
+			password: "ciaomondo"
 		}
 		request(app)
 		.post('/users/login')

@@ -1,16 +1,26 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
+import express, {Request, Response, Router} from 'express';
 import bodyParser from 'body-parser';
 import { IRestaurant, IPlatesRest } from '../models/restaurant';
 import { IOrder, IPlatesOrder } from '../models/order';
 import { Model } from 'mongoose';
 import { verifyToken } from '../JwtVerify/verify';
+import { check, validationResult, param } from 'express-validator';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Order: Model<IOrder> = require('../models/order');
 const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 
-router.post('/', verifyToken, async (req: Request, res: Response) => {
+router.post('/', [
+    check('user').isMongoId(),
+    check('restaurant').isMongoId(),
+    check('shippingAddress').isString(),
+    check('orderItems').isArray().notEmpty()
+], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
     try {
         let restaurant: IRestaurant | any = await Restaurant.findById({_id: req.body.restaurant}).exec();
             const existPlates: Boolean = req.body.orderItems
@@ -28,27 +38,49 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
             newOrder.totalAmount += item.price * item.quantity;
         });
         let result = await newOrder.save();
-        res.json({ result });
+        res.status(201).json(result);
     } catch (error) {
         return res.status(500).send(error);
     }
 });
 
-router.put('/:id', verifyToken, async (req: Request, res: Response) => {
-    await Order.findOneAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
-        if(err){
-            return res.status(404).send('Order not found');
+router.put('/:id', [
+    param('id').exists().isMongoId(),
+    check('orderItems').isArray().notEmpty()/* .custom( (orderItems: Array<IPlatesOrder>) => {
+        orderItems.forEach( (_plate: IPlatesOrder) => {
+                check('plate.*._id').exists().isMongoId(),
+                check('plate.*.name').exists().isString(),
+                check('plate.*.quantity').exists().isNumeric()
+        })
+    }) */
+    ], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
         }
-        return res.send('Order successful update');
-    });
+    if(!req.params.id){
+        return res.send('Order id required');
+    }
+    await Order.findOneAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
+        if(err) {
+            return res.send(err);
+        }
+        return res.status(200).send('Order updated');
+    });  
 });
 
-router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
+router.delete('/:id', [
+    param('id').exists().isMongoId()
+    ], verifyToken, async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+        }
     await Order.findByIdAndDelete( { _id: req.params.id}).exec( (err: Error, doc: IOrder) => {
         if(err){
-            return res.status(404).send('Order not found');
+            return res.send(err);
         }
-        return res.json({
+        return res.status(200).json({
             message: 'Order successful deleted',
             document: doc
         });

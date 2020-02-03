@@ -1,10 +1,10 @@
 import mongoose , { Schema, Document } from 'mongoose';
 
 const restaurantSchema: Schema = new Schema({
-    name: String,
-    address: String,
+    name: { type: String, required: true, unique: true },
+    address: { type: String, required: true, unique: true },
     city: String,
-    email: String,
+    email: { type: String, required: true, unique: true },
     plates: [{
         name: String,
         quantity : Number,
