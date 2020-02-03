@@ -1,6 +1,8 @@
 import request from "supertest";
+import { IUser } from '../models/user';
+import { Model } from "mongoose";
 const app = require('../../lib/app.js');
-const User = require('../../lib/models/user.js');
+const User: Model<IUser> = require('../models/user');
 
 // register test success
 
@@ -48,7 +50,7 @@ describe('PUT users/:username', () => {
 	it('expected test success users/:username', (done) => {
 		request(app)
 		.put('/users/lucreziaragusa99')
-		.query({
+		.query({ //token changed every time becouse it needs a login
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwiZW1haWwiOiJzaWdub3JlZmlvcmVkb21lbmljb0B0aXNjYWxpLml0IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNTgwNzQ1MDM5LCJleHAiOjE1ODA3NDg2Mzl9.7vRNls53wI6EsEqCQpa4-USOi_Uy5n_M9CCZjfoD0A8'
         })
 		.send({

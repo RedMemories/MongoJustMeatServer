@@ -1,6 +1,8 @@
 import request from 'supertest';
+import { Model } from 'mongoose';
+import { IRestaurant } from '../models/restaurant';
 const app = require('../../lib/app.js');
-const Restaurant = require('../../lib/models/restaurant.js');
+const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 
 // register test success
 
