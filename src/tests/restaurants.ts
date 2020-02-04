@@ -6,6 +6,8 @@ const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 
 // register test success
 
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MDgyOTMxMSwiZXhwIjoxNTgwODMyOTExfQ.GZC-_NSbqmV6XWb2C_uz744Go0b4UTiHfCi4sOv78Mg';
+
 describe('POST restaurant', () => {
 	it('test success restaurant', (done) => {
 		let testRestaurant = {
@@ -21,27 +23,27 @@ describe('POST restaurant', () => {
                 name: 'Meat test',
                 price: 10
             }],
-            typology: 'Restaurant'
+            typology: 'Ristorante'
 		}
 		request(app)
         .post('/restaurants')
         .query({
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwiZW1haWwiOiJzaWdub3JlZmlvcmVkb21lbmljb0B0aXNjYWxpLml0IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNTgwNzQ1MDM5LCJleHAiOjE1ODA3NDg2Mzl9.7vRNls53wI6EsEqCQpa4-USOi_Uy5n_M9CCZjfoD0A8'
+            token: token
         })
 		.send(testRestaurant)
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
 		.expect(201)
 		.end(() => {
-			Restaurant.findOneAndDelete({ name: testRestaurant.name}).exec(); //delete user after test passed
-			done();
-		});
+			Restaurant.findOneAndDelete({ name: testRestaurant.name}).exec(); //delete user after test passed	
+        });
+        done();
 	});
 	it('expect 403 restaurant name already present in db', (done) => {
 		request(app)
-        .post('/restaurant')
+        .post('/restaurants')
         .query({
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwiZW1haWwiOiJzaWdub3JlZmlvcmVkb21lbmljb0B0aXNjYWxpLml0IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNTgwNzQ1MDM5LCJleHAiOjE1ODA3NDg2Mzl9.7vRNls53wI6EsEqCQpa4-USOi_Uy5n_M9CCZjfoD0A8'
+            token: token
         })
 		.send({
 			name: "Pizza Rock",
@@ -53,10 +55,10 @@ describe('POST restaurant', () => {
                 price: 4
             },
             {
-                name: 'Meat test',
+                name: 'Carne test',
                 price: 10
             }],
-            typology: 'Restaurant'
+            typology: 'Ristorante'
 		})
 		.set('Accept', 'application/json')
 		.expect(403, done);
@@ -78,4 +80,27 @@ describe('GET restaurants/', () => {
         .expect('Content-Type', /json/)
 		.expect(200, done);
     });
+});
+
+describe('PUT restaurants/:id', () => {
+	it('expected test success update restaurants/:id', (done) => {
+		request(app)
+		.put('/restaurants/5e394207d4bdd2b738e951e1')
+		.send({
+			address: 'Via Genova 15',
+            email: 'pizzeriaroma@gmail.com',
+            plates: [
+                {
+                    name: 'Pasta carbonara',
+                    price: 10
+                },
+                {
+                    name: 'Bistecca fiorentina',
+                    price: 18
+                }
+            ]
+		})
+		.set('Accept', 'application/json')
+		.expect(200, done);
+	});
 });

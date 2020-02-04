@@ -5,6 +5,7 @@ const app = require('../../lib/app.js');
 const User: Model<IUser> = require('../models/user');
 
 // register test success
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MDgyOTMxMSwiZXhwIjoxNTgwODMyOTExfQ.GZC-_NSbqmV6XWb2C_uz744Go0b4UTiHfCi4sOv78Mg';
 
 describe('POST users', () => {
 	it('test success users', (done) => {
@@ -51,7 +52,7 @@ describe('PUT users/:username', () => {
 		request(app)
 		.put('/users/lucreziaragusa99')
 		.query({ //token changed every time becouse it needs a login
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwiZW1haWwiOiJzaWdub3JlZmlvcmVkb21lbmljb0B0aXNjYWxpLml0IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNTgwNzQ1MDM5LCJleHAiOjE1ODA3NDg2Mzl9.7vRNls53wI6EsEqCQpa4-USOi_Uy5n_M9CCZjfoD0A8'
+            token: token
         })
 		.send({
 			username: 'pippo.pulvi',

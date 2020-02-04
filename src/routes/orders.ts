@@ -22,20 +22,23 @@ router.post('/', [
         return res.status(422).json({ errors: errors.array() });
     }
     try {
-        let restaurant: IRestaurant | any = await Restaurant.findById({_id: req.body.restaurant}).exec();
-            const existPlates: Boolean = req.body.orderItems
-            .every(( orderPlate: IPlatesOrder ) => restaurant.plates.map((restaurantPlate: IPlatesRest) => restaurantPlate._id)
-            .includes(orderPlate._id));
-        if(!existPlates) {
+        let restaurant: IRestaurant = await Restaurant.findById({_id: req.body.restaurant}).exec() as NonNullable<IRestaurant>;
+        let orderPlates: Array<IPlatesOrder> = req.body.orderItems;
+        orderPlates
+            .every(( orderPlate: IPlatesOrder ) => restaurant.plates.map((restaurantPlate: IPlatesRest) => restaurantPlate.name)
+            .includes(orderPlate.name));
+        if(!orderPlates) {
             return res.status(404).send({ message: 'Can\'t order this plates' });
         }
-        let newOrder = new Order(req.body);
-        let orderItems: Array<IPlatesOrder> = req.body.orderItems;
-        orderItems.forEach( (item: IPlatesOrder) => {
-            restaurant.plates.forEach( (plate: IPlatesOrder) => {
-                item.price = plate.price;
+        let newOrder: IOrder = new Order(req.body);
+        newOrder.orderItems.forEach( (orderedItem: IPlatesOrder) => {
+            restaurant.plates.forEach( (plate: IPlatesRest) => {
+                if(plate.name === orderedItem.name) {
+                    orderedItem._id = plate._id;
+                    orderedItem.price = plate.price;
+                } 
             });
-            newOrder.totalAmount += item.price * item.quantity;
+            newOrder.totalAmount += orderedItem.price * orderedItem.quantity;
         });
         let result = await newOrder.save();
         res.status(201).json(result);
@@ -45,14 +48,7 @@ router.post('/', [
 });
 
 router.put('/:id', [
-    param('id').exists().isMongoId(),
-    check('orderItems').isArray().notEmpty()/* .custom( (orderItems: Array<IPlatesOrder>) => {
-        orderItems.forEach( (_plate: IPlatesOrder) => {
-                check('plate.*._id').exists().isMongoId(),
-                check('plate.*.name').exists().isString(),
-                check('plate.*.quantity').exists().isNumeric()
-        })
-    }) */
+    param('id').exists().isMongoId()
     ], verifyToken, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -61,11 +57,11 @@ router.put('/:id', [
     if(!req.params.id){
         return res.send('Order id required');
     }
-    await Order.findOneAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
+    await Order.findByIdAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
         if(err) {
-            return res.send(err);
+            return res.json(err);
         }
-        return res.status(200).send('Order updated');
+        return res.status(200).json({ message: 'Order status updated'});
     });  
 });
 

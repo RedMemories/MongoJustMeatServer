@@ -23,7 +23,7 @@ const orderSchema: Schema = new Schema({
     date: { type: Date , default: Date.now},
     shippingAddress: { type: String , required: true },
     orderItems: [{
-        _id : { type: String , required: true },
+        _id : { type: String, default: null},
         name : String ,
         quantity : Number,
         price : Number

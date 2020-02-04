@@ -52,7 +52,7 @@ router.post('/', [
     check('address').exists().isString(),
     check('email').exists().isEmail(),
     check('plates').isArray( {min: 1} ),
-    check('typology').exists().isString().isIn(['Restaurant', 'Pizza Restaurant'])
+    check('typology').exists().isString().isIn(['Ristorante', 'Pizzeria', 'Ristorante-Pizzeria'])
 ], verifyToken, async(req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
