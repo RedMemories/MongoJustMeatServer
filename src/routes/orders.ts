@@ -47,23 +47,7 @@ router.post('/', [
     }
 });
 
-router.put('/:id', [
-    param('id').exists().isMongoId()
-    ], verifyToken, async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-        }
-    if(!req.params.id){
-        return res.send('Order id required');
-    }
-    await Order.findByIdAndUpdate( {_id: req.params.id}, req.body).exec( (err: Error) => {
-        if(err) {
-            return res.json(err);
-        }
-        return res.status(200).json({ message: 'Order status updated'});
-    });  
-});
+
 
 router.delete('/:id', [
     param('id').exists().isMongoId()

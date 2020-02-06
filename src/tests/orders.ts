@@ -31,17 +31,3 @@ describe('POST call /orders', () => {
         .expect(201, done);
     });
 });
-
-describe('PUT call /orders', () => {
-    it('Order successifull updated', (done) => {
-        request(app)
-        .put('/orders/5e3983d7e94b611fbf795897')
-        .query({
-            token: token
-        })
-        .send({ statusOrder: true })
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200, done);
-    });
-});

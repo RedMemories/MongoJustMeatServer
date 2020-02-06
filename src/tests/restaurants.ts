@@ -104,3 +104,17 @@ describe('PUT restaurants/:id', () => {
 		.expect(200, done);
 	});
 });
+
+describe('PUT call /confirm', () => {
+    it('Order successifull updated', (done) => {
+        request(app)
+        .put('/restaurants/confirm/5e3983d7e94b611fbf795897')
+        .query({
+            token: token
+        })
+        .send({ statusOrder: true })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200, done);
+    });
+});
