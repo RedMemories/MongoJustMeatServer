@@ -6,7 +6,7 @@ const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 
 // register test success
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MDgyOTMxMSwiZXhwIjoxNTgwODMyOTExfQ.GZC-_NSbqmV6XWb2C_uz744Go0b4UTiHfCi4sOv78Mg';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MTM1MTQ3MSwiZXhwIjoxNTgxMzU1MDcxfQ.x_ZoNoLirwC-dWGfb7vAROIK4Vv9r0gpBIy3uFyNTK8';
 
 describe('POST restaurant', () => {
 	it('test success restaurant', (done) => {
@@ -27,9 +27,7 @@ describe('POST restaurant', () => {
 		}
 		request(app)
         .post('/restaurants')
-        .query({
-            token: token
-        })
+        .set('Authorization', token)
 		.send(testRestaurant)
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
@@ -42,9 +40,7 @@ describe('POST restaurant', () => {
 	it('expect 403 restaurant name already present in db', (done) => {
 		request(app)
         .post('/restaurants')
-        .query({
-            token: token
-        })
+        .set('Authorization', token)
 		.send({
 			name: "Pizza Rock",
             address: "Via delle Sciare 33",
@@ -108,10 +104,8 @@ describe('PUT restaurants/:id', () => {
 describe('PUT call /confirm', () => {
     it('Order successifull updated', (done) => {
         request(app)
-        .put('/restaurants/confirm/5e3983d7e94b611fbf795897')
-        .query({
-            token: token
-        })
+        .put('/restaurants/confirm/5e4183262e2d22195776948c')
+        .set('Authorization', token)
         .send({ statusOrder: true })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)

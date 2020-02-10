@@ -5,7 +5,8 @@ const app = require('../../lib/app.js');
 const User: Model<IUser> = require('../models/user');
 
 // register test success
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MDgyOTMxMSwiZXhwIjoxNTgwODMyOTExfQ.GZC-_NSbqmV6XWb2C_uz744Go0b4UTiHfCi4sOv78Mg';
+
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MTM1MTQ3MSwiZXhwIjoxNTgxMzU1MDcxfQ.x_ZoNoLirwC-dWGfb7vAROIK4Vv9r0gpBIy3uFyNTK8';
 
 describe('POST users', () => {
 	it('test success users', (done) => {
@@ -51,9 +52,7 @@ describe('PUT users/:username', () => {
 	it('expected test success users/:username', (done) => {
 		request(app)
 		.put('/users/lucreziaragusa99')
-		.query({ //token changed every time becouse it needs a login
-            token: token
-        })
+		.set('Authorization', token)
 		.send({
 			username: 'pippo.pulvi',
 			name: 'Pippo',

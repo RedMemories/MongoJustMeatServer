@@ -1,7 +1,7 @@
 import request from 'supertest';
 const app = require('../../lib/app.js');
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MDgyOTMxMSwiZXhwIjoxNTgwODMyOTExfQ.GZC-_NSbqmV6XWb2C_uz744Go0b4UTiHfCi4sOv78Mg';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWUzODQxNGYwM2Y1OWIzYjBjMjU2MzgwIiwidXNlcm5hbWUiOiJhZG1pbiIsImlzQWRtaW4iOnRydWUsImlhdCI6MTU4MTM1MTQ3MSwiZXhwIjoxNTgxMzU1MDcxfQ.x_ZoNoLirwC-dWGfb7vAROIK4Vv9r0gpBIy3uFyNTK8';
 
 describe('POST call /orders', () => {
     it('Order create success', (done) => {
@@ -22,9 +22,7 @@ describe('POST call /orders', () => {
         }
         request(app)
         .post('/orders')
-        .query({
-                token: token
-            })
+        .set('Authorization', token)
         .send(testOrder)
         .set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
