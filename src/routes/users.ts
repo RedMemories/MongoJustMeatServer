@@ -30,7 +30,7 @@ router.get('/:userId/orders', [
         if(err) {
             return res.send(err);
         }
-        return res.json({userOrders});
+        return res.json(userOrders);
     });
 });
 
