@@ -5,24 +5,25 @@ import { IRestaurant } from '../models/restaurant';
 import { IOrder } from '../models/order';
 import { validationResult, param, query, check } from 'express-validator';
 import { verifyToken } from '../JwtVerify/verify';
+import jwt from 'jsonwebtoken';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 const Order: Model<IOrder> = require('../models/order');
 
-router.get('/:restaurantId/orders', [
-    param('restaurantId').exists().isMongoId()
-], async (req: Request, res: Response) => {
+router.get('/orders', verifyToken, async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
     }
-    let restaurant: IRestaurant | null = await Restaurant.findById({ _id: req.params.restaurantId }).exec();
+    let header: any = JSON.stringify(jwt.decode(req.headers.authorization as string));
+    console.log(header)
+    let restaurant: IRestaurant | null = await Restaurant.findById({ _id: header.restaurant }).exec();
     if(!restaurant) {
         res.status(404).send('Restaurant not found');
     }
-    await Order.find({ restaurant: req.params.restaurantId}).exec((err: Error, restaurantOrders: IOrder) => {
+    await Order.find({ restaurant: header.restaurant }).exec((err: Error, restaurantOrders: Array<IOrder>) => {
         if(err) {
             return res.send(err);
         }

@@ -70,8 +70,8 @@ describe('POST users/login', () => {
 		request(app)
 		.post('/users/login')
 		.send({
-			username: "pippo.pulvi",
-			password: "salvoavon"
+			email: "mario.urso@gmail.com",
+			password: "iostudio"
 		})
 		.set('Accept', 'application/json')
 		.expect('Content-Type', /json/)
@@ -81,7 +81,7 @@ describe('POST users/login', () => {
 		request(app)
 		.post('/users/login')
 		.send({
-			username: "pippo",
+			email: "pippo@gmail.com",
 			password: "ciaomondo"
 		})
 		.set('Accept', 'application/json')

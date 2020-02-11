@@ -69,21 +69,35 @@ router.post('/', [
     if(user) {
         return res.status(403).json({ message: 'Username already in use' });
     }
+    let rest: IRestaurant | null = await Restaurant.findOne({ email: req.body.email}).exec();
     try {
         req.body.password = Bcrypt.hashSync(req.body.password, 10);
         let newUser: IUser = new User(req.body);
         let payload: Object;
+        if(rest) {
+            payload = { 
+                subject: newUser._id, 
+                email: newUser.email, 
+                isAdmin: true,
+                isRestaurant: true,
+                restaurant: rest._id
+            }
+        }
         if(req.body.username === 'admin') {
             payload = { 
                 subject: newUser._id, 
                 email: newUser.email, 
-                isAdmin: true 
+                isAdmin: true,
+                isRestaurant: false,
+                restaurant: null
             }
         } else {
             payload = { 
                 subject: newUser._id, 
                 email: newUser.email, 
-                isAdmin: false 
+                isAdmin: false,
+                isRestaurant: false,
+                restaurant: null
             }
         }
         let token: string = jwt.sign(payload, 'FLIZsTmhpB', {expiresIn: 3600});
@@ -98,7 +112,7 @@ router.post('/', [
 });
 
 router.post('/login', [
-    check('username').exists().isString(),
+    check('email').exists().isEmail(),
     check('password').isLength({ min: 5, max: 15 })
 ], async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -106,7 +120,8 @@ router.post('/login', [
         return res.status(422).json({ errors: errors.array() });
     }
     try {
-        let user: IUser | null = await User.findOne({ username: req.body.username }).exec();
+        let user: IUser | null = await User.findOne({ email: req.body.email }).exec();
+        let rest: IRestaurant | null = await Restaurant.findOne({ email: req.body.email}).exec();
         if(!user) {
             return res.status(404).send({ message: "The username does not exist" });
         }
@@ -114,17 +129,31 @@ router.post('/login', [
             return res.status(404).send({ message: "The password is invalid" });
         }
         let payload: Object;
+        if(rest) {
+            payload = {
+                subject: user._id,
+                username: user.username,
+                isAdmin: false,
+                isRestaurant: true,
+                restaurant: rest._id
+            }
+            console.log(payload)
+        }
         if(user.username === 'admin') {
             payload = { 
-                subject: user.id, 
+                subject: user._id, 
                 username: user.username, 
-                isAdmin: true 
+                isAdmin: true,
+                isRestaurant: false,
+                restaurant: null
             }
         } else {
             payload = { 
-                subject: user.id, 
+                subject: user._id, 
                 username: user.username, 
-                isAdmin: false 
+                isAdmin: false,
+                isRestaurant: false,
+                restaurant: null 
             }
         }
         let token: string = jwt.sign(payload, 'FLIZsTmhpB', { expiresIn: 3600 });
