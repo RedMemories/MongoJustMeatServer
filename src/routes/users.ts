@@ -137,25 +137,24 @@ router.post('/login', [
                 isRestaurant: true,
                 restaurant: rest._id
             }
-            console.log(payload)
-        }
-        if(user.username === 'admin') {
-            payload = { 
-                subject: user._id, 
-                username: user.username, 
-                isAdmin: true,
-                isRestaurant: false,
-                restaurant: null
+        } else
+            if(user.username === 'admin') {
+                payload = { 
+                    subject: user._id, 
+                    username: user.username, 
+                    isAdmin: true,
+                    isRestaurant: false,
+                    restaurant: null
+                }
+            } else {
+                payload = { 
+                    subject: user._id, 
+                    username: user.username, 
+                    isAdmin: false,
+                    isRestaurant: false,
+                    restaurant: null 
+                }
             }
-        } else {
-            payload = { 
-                subject: user._id, 
-                username: user.username, 
-                isAdmin: false,
-                isRestaurant: false,
-                restaurant: null 
-            }
-        }
         let token: string = jwt.sign(payload, 'FLIZsTmhpB', { expiresIn: 3600 });
         res.status(200).json({
             message: `Welcome ${user.name}!`,

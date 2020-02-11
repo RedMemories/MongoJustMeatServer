@@ -18,8 +18,8 @@ router.get('/orders', verifyToken, async (req: Request, res: Response) => {
         return res.status(422).json({ errors: errors.array() });
     }
     let header: any = JSON.stringify(jwt.decode(req.headers.authorization as string));
-    console.log(header)
-    let restaurant: IRestaurant | null = await Restaurant.findById({ _id: header.restaurant }).exec();
+    header = JSON.parse(header);
+    let restaurant: IRestaurant | null = await Restaurant.findById({ _id: header.restaurant}).exec();
     if(!restaurant) {
         res.status(404).send('Restaurant not found');
     }
