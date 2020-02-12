@@ -8,13 +8,11 @@
     "servers": [
         {
             "url": "/",
-            "description": "Local Dev, or from Heroku"
-        },
-        {
-            "url": "/api/",
-            "description": "With docker-compose and nginx proxy"
+            "description": "localhost:3006"
         }
     ],
+    "host": "localhost:3006",
+    "basePath": "",
     "tags": [
         {
             "name": "Restaurants",
@@ -27,210 +25,102 @@
     "produces": [
         "application/json"
     ],
-    "paths": {
-        "/restaurants": {
-            "get": {
-                "tags": [
-                    "Restaurants"
-                ],
-                "summary": "Get all restaurants in system",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/Restaurants"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Restaurants"
-                ],
-                "summary": "Create a new restaurants in system",
-                "requestBody": {
-                    "description": "Restaurants Object",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/definitions/Restaurant"
-                            }
-                        }
-                    }
-                },
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    "403": {
-                        "description": "Restaurant already esist."
-                    },
-                    "500": {
-                        "description": "Error"
-                    }
-                }
-            }
-        },
-        "/restaurants/{id}": {
-            "get": {
-              "tags": [
-                "Restaurants"
-              ],
-              "summary": "Return restaurant by ID",
-              "description": "Returns a single restaurant based on the ID",
-              "operationId": "findById",
-              "parameters": [
-                {
-                  "name": "_id",
-                  "in": "path",
-                  "description": "ID of resturant to return",
-                  "required": true,
-                  "style": "simple",
-                  "explode": false,
-                  "schema": {
-                    "type": "string"
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "A single restaurant"
-                },
-                "401": {
-                  "description": "You shouldn't be here"
-                },
-                "404": {
-                  "description": "restaurant not Found"
-                }
-              }
-            },
-            "put": {
-                "summary": "Update restaurant with given ID",
-                "tags": [
-                    "Restaurants"
-                ],
-                "requestBody": {
-                    "description": "Restaurant Object",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/definitions/Restaurant"
-                            }
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "description": "Restaurant with new values of properties",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK, restaurant is update",
-                        "schema": {
-                            "$ref": "#/definitions/Restaurants"
-                        }
-                    },
-                    "400": {
-                        "description": "Failed. Bad post data."
-                    },
-                    "404": {
-                        "description": "Restaurant not found..."
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Delete restaurant with given ID",
-                "tags": [
-                    "Restaurants"
-                ],
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "description": "Delete Restaurant with id",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    "404": {
-                        "description": "Failed. Restaurant not found."
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "id": {
-            "properties": {
-                "_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "Restaurant": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "address": {
-                    "type": "string"
-                },
-                "city": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "plate":{
-                    "type":"object",
-                    "properties": {
-                        "name": "string",
-                        "price": "value"
-                    }
-                },
-                "rating":{
-                    "type": "string"
-                },
-                "typology": {
-                    "type": "string"
-                }
-            }
-        },
-        "Restaurants": {
-            "type": "object",
-            "properties": {
-                "restaurants": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/Restaurant"
-                    }
-                }
-            }
-        }
+  "securityDefinitions": {
+    "JWT": {
+      "description": "",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
+  },
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "type": "apiKey",
+        "description": "This is the authentication token you need to insert:  ",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+
+
+  "paths": {
+    "/restaurants": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "Get all restaurants in system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Restaurants"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "id": {
+      "properties": {
+        "_id":{
+          "type": "string"
+        }
+      }
+    },
+    "Restaurant": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type":"string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "plates": {
+          "type": "object",
+          "properties": {
+            "name":{
+              "type": "string"
+            },
+            "price": {
+              "type": "number"
+            }
+          }
+        },
+        "rating": {
+          "type": "number"
+        },
+        "typology":{
+          "type": "string"
+        }
+      }
+    },
+    "Restaurants": {
+      "type": "object",
+      "properties": {
+        "restauants":{
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#definitions/Restaurant"
+          }
+        }
+      }
+    }
+  }
 }
