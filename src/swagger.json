@@ -65,6 +65,22 @@
             }
           }
         }
+      },
+      "post": {
+        "tags":[
+          "Restaurants"
+        ],
+        "summary": "Create a new Restaurant in system",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Restaurant that we want to create",
+            "schema":{
+              "$ref": "#/definitions/Restaurant"
+            }
+          }
+        ]
       }
     }
   },
