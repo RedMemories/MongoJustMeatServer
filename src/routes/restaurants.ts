@@ -87,7 +87,7 @@ router.put('/:id', [
     });
 });
 
-router.put('confirm/:id', [
+router.put('status/:id', [
     param('id').exists().isMongoId()
     ], verifyToken, async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -107,7 +107,7 @@ router.put('confirm/:id', [
 
 router.delete('/:id', [
     param('id').exists().isMongoId()
-], async (req: Request, res: Response) => {
+],verifyToken ,async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
