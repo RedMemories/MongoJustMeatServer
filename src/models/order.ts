@@ -7,7 +7,7 @@ export interface IOrder extends Document{
     orderItems: IPlatesOrder[],
     totalAmount: number,
     rating : number,
-    statusOrder : boolean
+    statusOrder : String
 }
 
 export interface IPlatesOrder extends Document{
@@ -31,7 +31,11 @@ const orderSchema: Schema = new Schema({
     ],
     totalAmount: { type: Number, default: 0 },
     rating : { type: Number, default: null},
-    statusOrder: { type: Boolean, default: false}
+    statusOrder: { 
+        type: String,
+        enum: ['NEW', 'ACCEPTED', 'SHIPPED', 'DELIVERED'],
+        default: 'NEW'
+    }
 });
 
 
