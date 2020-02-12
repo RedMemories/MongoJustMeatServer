@@ -26,6 +26,13 @@ router.get('/:userId/orders', [
     if(!user) {
         res.status(404).send('User not found');
     }
+    if(req.query.id){
+        let userOrder: IOrder | null = await Order.findOne({ user: req.params.userId, _id: req.query.id }).exec();
+        if(!userOrder) {
+            return res.status(404).send('Order not found');
+        }
+        return res.json(userOrder);
+    }
     await Order.find({ user: req.params.userId}).exec((err: Error, userOrders: Array<IOrder>) => {
         if(err) {
             return res.send(err);

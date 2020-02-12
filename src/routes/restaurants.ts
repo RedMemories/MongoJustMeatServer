@@ -21,7 +21,14 @@ router.get('/orders', verifyToken, async (req: Request, res: Response) => {
     header = JSON.parse(header);
     let restaurant: IRestaurant | null = await Restaurant.findById({ _id: header.restaurant}).exec();
     if(!restaurant) {
-        res.status(404).send('Restaurant not found');
+        return res.status(404).send('Restaurant not found');
+    }
+    if(req.query.id){
+        let restaurantOrder: IOrder | null = await Order.findOne({ restaurant: header.restaurant, _id: req.query.id }).exec();
+        if(!restaurantOrder) {
+            return res.status(404).send('Order not found');
+        }
+        return res.json(restaurantOrder);
     }
     await Order.find({ restaurant: header.restaurant }).exec((err: Error, restaurantOrders: Array<IOrder>) => {
         if(err) {
