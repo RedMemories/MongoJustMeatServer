@@ -2,12 +2,17 @@
   "name": "mongo_just_meat_server",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "12.16.x",
+    "npm": "6.13.x"
+  },
   "main": "index.js",
   "scripts": {
     "start": "node lib/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc -p .",
-    "test": "tsc -p . && mocha lib/tests --timeout 10000"
+    "test": "tsc -p . && mocha lib/tests --timeout 10000",
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
