@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/app.ts",
+    "start": "node lib/app.js",
+    "dev": "nodemon src/app.ts",
     "build": "tsc -p .",
     "test": "tsc -p . && mocha lib/tests --timeout 10000"
   },
