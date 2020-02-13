@@ -94,7 +94,7 @@ router.put('/:id', [
     });
 });
 
-router.put('status/:id', [
+router.put('/:id/status', [
     param('id').exists().isMongoId()
     ], verifyToken, async (req: Request, res: Response) => {
     const errors = validationResult(req);

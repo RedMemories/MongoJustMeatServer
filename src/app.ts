@@ -5,19 +5,18 @@ import Orders from './routes/orders';
 import cors from 'cors';
 import { dbConnect } from './dbConnection/connection';
 import mongoose from 'mongoose';
-import http from 'http';
-import socketIO from 'socket.io';
 import swaggerUi from 'swagger-ui-express'
 import * as swaggerDocument from './swagger.json'
+import http from 'http';
+import socketIO from 'socket.io';
 
 
 mongoose.set('debug', false);
-mongoose.set('useFindAndModify', false);
 
 const app: Application = express();
-const server = http.createServer(app);
-const io = socketIO(server);
-const PORT = 3006;
+// const server = http.createServer(app);
+// const io = socketIO(server);
+const port = process.env.PORT || 3006;
 
 dbConnect().then(()=> { 
         console.log('Connected to MongoDB');
@@ -32,18 +31,13 @@ app.use('/orders', Orders);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
-io.on('connection', (socket: any) => {
-   
-    socket.on('set-name', (status: string) => {
-      socket.status = status;
-      io.emit('status-changed', {status, event: 'status updated'});  
-    });
-  });
+// io.on('connection', (socket: any) => {
+//     socket.on('set-name', (name: string) => {
+//         console.log('Name: ' + name);
+//       socket.status = name;
+//       io.emit('status-changed', {status: name, event: 'status updated'});  
+//     });
+//   });
 
-app.listen(PORT, "Localhost", (err) => {
-    if(err) {
-        return console.log(err);
-    }
-    console.log(`Server is running on localhost: ${PORT}`);
-});
+app.listen(port);
 module.exports = app;
