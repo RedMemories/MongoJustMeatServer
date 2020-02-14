@@ -177,29 +177,35 @@
       }
     },
     "/users" : {
-      "post" : {
-        "tags" : [ "Login" ],
-        "summary" : "Creates list of users with given input array",
-        "operationId" : "createUser",
-        "produces" : [ "application/json"],
-        "parameters" : [ {
-          "in" : "path",
-          "name" : "body",
-          "description" : "Created user object",
-          "required" : true,
-          "schema" : {
-              "$ref" : "#/definitions/user"
-          }
-        }],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema": {
-              "$ref": "#/definitions/user"
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Create user",
+        "description": "Create a new user",
+        "requestBody": {
+          "description": "Create user",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/user"
+              }
             }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "User Create"
           },
-          "422":{
-            "description": "Unprocessable Entity"
+          "422": {
+            "description": "Empty Array"
+          },
+          "403":{
+            "description": "Username already in use"
           }
         }
       },
@@ -225,12 +231,12 @@
         ],
         "summary": "Edit users by username",
         "description": "Allows you to edit a user by username",
-        "operationId": "modifyUserById",
+        "operationId": "modifyUserByUsername",
         "parameters": [
           {
             "name": "username",
             "in": "path",
-            "description": "ID of user to return",
+            "description": "Username of user to return",
             "required": true,
             "style": "simple",
             "explode": false,
@@ -259,6 +265,28 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "users" ],
+        "summary" : "Delete User",
+        "description" : "This can only be done by the logged in user.",
+        "operationId" : "deleteUser",
+        "produces" : [ "application/json"],
+        "parameters" : [ {
+          "name" : "username",
+          "in" : "path",
+          "description" : "The user that needs to be deleted",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "400" : {
+            "description" : "Invalid user supplied"
+          },
+          "404" : {
+            "description" : "User not found"
           }
         }
       }
