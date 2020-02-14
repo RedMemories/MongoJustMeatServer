@@ -1,0 +1,139 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "JustMeat API",
+        "description": "A minimal and easy create a CRUD style API in NodeJs using TypeScript"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "localhost:3006"
+        }
+    ],
+    "host": "localhost:3006",
+    "basePath": "",
+    "tags": [
+        {
+            "name": "Restaurants",
+            "description": "API for restaurants in the system"
+        }
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "JWT": {
+            "description": "",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "JWT": {
+                "type": "apiKey",
+                "description": "This is the authentication token you need to insert:  ",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "security": [
+        {
+            "JWT": []
+        }
+    ],
+    "paths": {
+        "/restaurants": {
+            "get": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Get all restaurants in system",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Restaurants"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Create a new Restaurant in system",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Restaurant that we want to create",
+                        "schema": {
+                            "$ref": "#/definitions/Restaurant"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "id": {
+            "properties": {
+                "_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "Restaurant": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "plates": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "price": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "typology": {
+                    "type": "string"
+                }
+            }
+        },
+        "Restaurants": {
+            "type": "object",
+            "properties": {
+                "restauants": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#definitions/Restaurant"
+                    }
+                }
+            }
+        }
+    }
+}

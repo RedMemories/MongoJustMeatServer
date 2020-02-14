@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node lib/app.js",
     "dev": "nodemon src/app.ts",
-    "build": "tsc -p .",
+    "build": "",
     "test": "tsc -p . && mocha lib/tests --timeout 10000",
     "heroku-postbuild": "npm run build"
   },
