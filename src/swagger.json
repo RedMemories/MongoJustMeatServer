@@ -17,6 +17,14 @@
         {
             "name": "Restaurants",
             "description": "API for restaurants in the system"
+        },
+        {
+          "name": "Login",
+          "description": "Management login API"
+        },
+        {
+          "name": "users",
+          "description": "Management user API"
         }
     ],
     "consumes": [
@@ -70,20 +78,224 @@
         "tags":[
           "Restaurants"
         ],
-        "summary": "Create a new Restaurant in system",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Restaurant that we want to create",
-            "schema":{
+        "summary": "Create a new restaurant in system",
+        "requestBody": {
+            "description": "Restaurant Object",
+            "required": true,
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "$ref": "#/definitions/Restaurant"
+                    }
+                }
+            }
+        },
+        "produces":[
+          "application/json"
+        ],
+        "response": {
+          "200": {
+            "description": "OK",
+            "schema": {
               "$ref": "#/definitions/Restaurant"
             }
+          },
+          "400": {
+            "description": "Failed, bad post data"
+          },
+          "422":{
+            "description": "Empty Array"
           }
-        ]
+        }
+      }
+    },
+    "/restaurants/{id}" : {
+      "put":{
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "Edit Restaurant by ID",
+        "description": "Allows you to edit a restaurant by id",
+        "operationId": "modifyRestaurantById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of subject to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Modify new subject",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Restaurant"
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Restaurants" ],
+        "summary" : "Delete Restaurant",
+        "description" : "This can only be done by the logged in user.",
+        "operationId" : "deleteRestaurant",
+        "produces" : [ "application/json"],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "The restaurant that needs to be deleted",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "400" : {
+            "description" : "Invalid restaurant supplied"
+          },
+          "404" : {
+            "description" : "Restaurant not found"
+          }
+        }
+      }
+    },
+    "/users" : {
+      "post" : {
+        "tags" : [ "Login" ],
+        "summary" : "Creates list of users with given input array",
+        "operationId" : "createUser",
+        "produces" : [ "application/json"],
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "body",
+          "description" : "Created user object",
+          "required" : true,
+          "schema" : {
+              "$ref" : "#/definitions/user"
+          }
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          },
+          "422":{
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get all users in system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/users"
+            }
+          }
+        }
+      }
+    },
+    "/users/{username}": {
+      "put":{
+        "tags": [
+          "users"
+        ],
+        "summary": "Edit users by username",
+        "description": "Allows you to edit a user by username",
+        "operationId": "modifyUserById",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "ID of user to return",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Modify new user",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/user"
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+  "/users/login": {
+    "post": {
+      "tags": [
+        "Login"
+      ],
+      "summary": "Login user",
+      "description": "Allows you to login user",
+      "requestBody": {
+        "description": "Do login",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/login"
+            }
+          }
+        }
+      },
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "User logged in"
+        },
+        "400": {
+          "description": "Bad request, couldn't log in"
+        }
       }
     }
-  },
+  }
+},
+  
 
   "definitions": {
     "id": {
@@ -134,6 +346,58 @@
           "type": "object",
           "additionalProperties": {
             "$ref": "#definitions/Restaurant"
+          }
+        }
+      }
+    },
+    "login": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "required": true
+        },
+        "password": {
+          "type": "string",
+          "required": true
+        }
+      }
+    },
+    "user": {
+      "properties": {
+        "username": {
+          "type": "string",
+          "required": true,
+          "unique": true
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "required": true,
+          "unique": true
+        }
+      }
+    },
+    "users": {
+      "type": "object",
+      "properties": {
+        "restauants":{
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#definitions/user"
           }
         }
       }
