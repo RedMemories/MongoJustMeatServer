@@ -75,36 +75,34 @@
         }
       },
       "post": {
-        "tags":[
+        "tags": [
           "Restaurants"
         ],
-        "summary": "Create a new restaurant in system",
+        "summary": "Create Restaurant",
+        "description": "Create a new restaurant",
         "requestBody": {
-            "description": "Restaurant Object",
-            "required": true,
-            "content": {
-                "application/json": {
-                    "schema": {
-                        "$ref": "#/definitions/Restaurant"
-                    }
-                }
+          "description": "Create restaurant",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/Restaurant"
+              }
             }
+          }
         },
-        "produces":[
+        "produces": [
           "application/json"
         ],
-        "response": {
+        "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Restaurant"
-            }
+            "description": "Restaurant Create"
           },
-          "400": {
-            "description": "Failed, bad post data"
-          },
-          "422":{
+          "422": {
             "description": "Empty Array"
+          },
+          "403":{
+            "description": "Name already in use"
           }
         }
       }
@@ -115,7 +113,7 @@
           "Restaurants"
         ],
         "summary": "Edit Restaurant by ID",
-        "description": "Allows you to edit a restaurant by id",
+        "description": "This can only be done by the logged in user",
         "operationId": "modifyRestaurantById",
         "parameters": [
           {
@@ -321,6 +319,54 @@
         }
       }
     }
+  },
+  "/users/putRating/{restaurantId}":{
+    "put":{
+      "tags": [
+        "users"
+      ],
+      "summary": "Edit rating by restaurantID",
+      "description": "Allows you to edit a rating by restaurantID",
+      "operationId": "modifyRatingByrestaurantID",
+      "parameters": [
+        {
+          "name": "restaurantId",
+          "in": "path",
+          "description": "_id of restaurant rating to return",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "requestBody": {
+        "description": "Modify new rating",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/rating"
+            }
+          }
+        }
+      },
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "schema": {
+            "$ref": "#/definitions/Restaurant"
+          }
+        },
+        "404": {
+          "description": "Not Found"
+        }
+      }
+    }
   }
 },
   
@@ -349,7 +395,8 @@
           "type": "string"
         },
         "plates": {
-          "type": "object",
+          "type": "array",
+          "items":{
           "properties": {
             "name":{
               "type": "string"
@@ -358,7 +405,8 @@
               "type": "number"
             }
           }
-        },
+        }
+      },
         "rating": {
           "type": "number"
         },
@@ -375,6 +423,14 @@
           "additionalProperties": {
             "$ref": "#definitions/Restaurant"
           }
+        }
+      }
+    },
+    "rating":{
+      "type":"object",
+      "properties":{
+        "rating":{
+          "type":"number"
         }
       }
     },
