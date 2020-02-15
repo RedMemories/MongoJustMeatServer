@@ -1,4 +1,4 @@
-import express, {Request, Response, Router} from 'express';
+import express, {Request, Response, Router, Application} from 'express';
 import bodyParser from 'body-parser';
 import { Model } from 'mongoose';
 import { IRestaurant } from '../models/restaurant';
@@ -11,6 +11,22 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 const Order: Model<IOrder> = require('../models/order');
+
+// Socket required imports
+import http from 'http';
+import socketIO from 'socket.io';
+const app: Application = express();
+const server = http.createServer(app);
+const io = socketIO(server);
+
+io.on('connection', (socket: any) => {
+    socket.on('set-name', (name: string) => {
+        console.log('Name: ' + name);
+      socket.status = name;
+      io.emit('status-changed', {status: name, event: 'status updated'});  
+    });
+  });
+
 
 router.get('/orders', verifyToken, async (req: Request, res: Response) => {
     const errors = validationResult(req);
