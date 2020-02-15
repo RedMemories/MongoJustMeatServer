@@ -7,8 +7,13 @@ import { dbConnect } from './dbConnection/connection';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express'
 import * as swaggerDocument from './swagger.json'
-
+import http from 'http';
+import socketIO from 'socket.io';
+import { IRestaurant } from './models/restaurant';
+import { IOrder } from './models/order';
 const app: Application = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
 const PORT = process.env.PORT || 3006;
 
@@ -19,28 +24,38 @@ dbConnect().then(()=> {
     });
 
 app.use((_req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:8100");
-    res.header(
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
-    res.header(
+    res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
     );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     next();
 });
 
-const whitelist = ['http://localhost:3006'];
-const corsOptions = {
-  credentials: true, // This is important.
-  origin: (origin: any, callback: any) => {
-    if(whitelist.includes(origin))
-      return callback(null, true)
+io.on('connection', (socket: socketIO.Socket & {order: IOrder}) => {
+  socket.on("disconnect", () => {});
 
-      callback(new Error('Not allowed by CORS'));
-  }
-}
+  socket.on('set-name', (order: IOrder) => {
+    socket.order.statusOrder = order.statusOrder;
+    io.emit('status-changed', {status: order.statusOrder, event: 'status updated'});  
+  });
+});
+
+// const whitelist = ['http://localhost:8100'];
+// const corsOptions = {
+//   credentials: true, // This is important.
+//   origin: (origin: any, callback: any) => {
+//     if(whitelist.includes(origin))
+//       return callback(null, true)
+
+//       callback(new Error('Not allowed by CORS'));
+//   }
+// }
 app.use(cors());
 app.use('/users', Users);
 app.use('/restaurants', Restaurants);
@@ -51,4 +66,5 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(PORT, () => {
     console.log(`Server ready at http://localhost:${PORT}`);
 });
+export {io};
 module.exports = app;

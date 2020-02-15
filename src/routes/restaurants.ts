@@ -6,26 +6,12 @@ import { IOrder } from '../models/order';
 import { validationResult, param, query, check } from 'express-validator';
 import { verifyToken } from '../JwtVerify/verify';
 import jwt from 'jsonwebtoken';
+import { io } from '../app';
 const router: Router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 const Restaurant: Model<IRestaurant> = require('../models/restaurant');
 const Order: Model<IOrder> = require('../models/order');
-
-// Socket required imports
-import http from 'http';
-import socketIO from 'socket.io';
-const app: Application = express();
-const server = http.createServer(app);
-const io = socketIO(server);
-
-io.on('connection', (socket: any) => {
-    socket.on('set-name', (name: string) => {
-        console.log('Name: ' + name);
-      socket.status = name;
-      io.emit('status-changed', {status: name, event: 'status updated'});  
-    });
-  });
 
 
 router.get('/orders', verifyToken, async (req: Request, res: Response) => {
@@ -107,7 +93,10 @@ router.put('/:id', [
             return res.send(err);
         }
         return res.status(200).send('Restaurant updated');
-    });
+    }), () => {
+        io.emit("status-changed", { event: "Order status changed" });
+        return;
+    }
 });
 
 router.put('/:id/status', [
