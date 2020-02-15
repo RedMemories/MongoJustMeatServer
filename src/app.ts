@@ -31,7 +31,7 @@ app.use((_req, res, next) => {
     next();
 });
 
-const whitelist = ['http://localhost:8100', 'http://localhost:3006'];
+const whitelist = ['http://localhost:3006'];
 const corsOptions = {
   credentials: true, // This is important.
   origin: (origin: any, callback: any) => {
@@ -41,7 +41,7 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
   }
 }
-app.use(cors(corsOptions));
+app.use(cors());
 app.use('/users', Users);
 app.use('/restaurants', Restaurants);
 app.use('/orders', Orders);
