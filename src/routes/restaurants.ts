@@ -93,10 +93,7 @@ router.put('/:id', [
             return res.send(err);
         }
         return res.status(200).send('Restaurant updated');
-    }), () => {
-        io.emit("status-changed", { event: "Order status changed" });
-        return;
-    }
+    });
 });
 
 router.put('/:id/status', [
@@ -114,7 +111,10 @@ router.put('/:id/status', [
             return res.json(err);
         }
         return res.status(200).json({ message: 'Order status updated'});
-    });  
+    }), () => {
+        io.emit("status-changed", { event: "Order status changed" });
+        return;
+    }  
 });
 
 router.delete('/:id', [
