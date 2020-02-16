@@ -18,7 +18,7 @@
 
 ###### PUT call
 
- **- `(\:id)`** Searching restaurant by ID .
+ **- `(/:id)`** Searching restaurant by ID .
 
  **- `(/:id/status)`** Changing status of order by using ID of the order .
  
